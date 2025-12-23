@@ -10,20 +10,6 @@ SCRIPT_NAME="mqtt2notif.py"
 
 echo "🚀 Installing mqtt2notif Daemon..."
 
-# Install dependencies
-echo "📦 Installing Python dependencies..."
-if command -v pacman &> /dev/null; then
-    echo "   Detected pacman. Installing python-paho-mqtt and python-gobject..."
-    sudo pacman -S --needed python-paho-mqtt python-gobject
-elif [ -f "requirements.txt" ]; then
-    echo "   Installing via pip..."
-    if command -v pip3 &> /dev/null; then
-        pip3 install --user -r requirements.txt
-    else
-        python3 -m pip install --user -r requirements.txt
-    fi
-fi
-
 # Create binary directory if it doesn't exist
 mkdir -p "$BIN_DIR"
 

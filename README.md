@@ -47,7 +47,6 @@ sudo apt install python3-gi python3-paho-mqtt python3-pillow gir1.2-notify-0.7 l
 
 This will:
 
-- Install dependencies
 - Copy `mqtt2notif.py` to `~/.local/bin/`
 - Install systemd service to `~/.config/systemd/user/`
 - Enable and start the service

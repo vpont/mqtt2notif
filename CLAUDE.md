@@ -113,7 +113,7 @@ Desktop Notification Display
 
 ### Image Processing
 
-- **Icon Handling**: Decode Base64 → save to `/tmp/notif_*.png` → attach to notification
+- **Icon Handling**: Decode Base64 → attach to notification
 - **Preview Images**: Optional Pillow-based composite (icon overlaid on preview)
 - **Formats**: PNG, JPEG
 - **Cleanup**: Temporary files removed after notification display
@@ -222,6 +222,7 @@ password =                  # Optional MQTT password
 ### "ModuleNotFoundError: No module named 'gi'"
 
 Install PyGObject:
+
 ```bash
 # Arch
 sudo pacman -S python-gobject
@@ -252,6 +253,7 @@ Ensure `Notify.init('mqtt2notif')` is called before creating any notifications. 
 ### "Pillow not installed" warning
 
 Optional dependency - install if you want composite images:
+
 ```bash
 pip install --user Pillow
 ```
@@ -268,6 +270,7 @@ pip install --user Pillow
 **Current Status**: No automated tests configured.
 
 **Recommendations**:
+
 - Unit tests for JSON parsing
 - Unit tests for Base64 image decoding
 - Unit tests for urgency mapping
@@ -279,12 +282,13 @@ pip install --user Pillow
 
 **Notif2MQTT**: Android app that captures notifications and publishes them to MQTT. This daemon is designed to receive and display those notifications on Linux.
 
-- Repository: https://github.com/yourusername/Notif2MQTT
+- Repository: https://github.com/vpont/Notif2MQTT
 - Together they form: Android → MQTT → Linux Desktop notification bridge
 
 ## Recent Updates
 
 **Latest Changes**:
+
 - Split from Notif2MQTT monorepo into independent mqtt2notif project
 - Configuration path changed to `~/.config/mqtt2notif/` for naming consistency
 - Updated all scripts to use `mqtt2notif` naming
