@@ -28,11 +28,13 @@ A lightweight Python daemon that receives Android notifications from MQTT and di
 ### Install System Dependencies
 
 **Arch Linux:**
+
 ```bash
 sudo pacman -S python-gobject libnotify
 ```
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt install python3-gi gir1.2-notify-0.7 libnotify-bin
 ```
@@ -44,6 +46,7 @@ pip install --user -r requirements.txt
 ```
 
 Or manually:
+
 ```bash
 pip install --user paho-mqtt PyGObject Pillow
 ```
@@ -55,6 +58,7 @@ pip install --user paho-mqtt PyGObject Pillow
 ```
 
 This will:
+
 - Install dependencies
 - Copy `mqtt2notif.py` to `~/.local/bin/`
 - Install systemd service to `~/.config/systemd/user/`
@@ -77,7 +81,6 @@ This creates a configuration file with defaults:
 broker = localhost
 port = 1883
 ssl = false
-topic = notif2mqtt/notifications
 username =
 password =
 ```
@@ -87,7 +90,6 @@ password =
 - **broker**: MQTT broker hostname or IP address
 - **port**: MQTT broker port (1883 for unencrypted, 8883 for SSL)
 - **ssl**: Enable SSL/TLS encryption (`true` or `false`)
-- **topic**: MQTT topic to subscribe to (must match sender)
 - **username**: MQTT authentication username (optional)
 - **password**: MQTT authentication password (optional)
 
@@ -151,6 +153,7 @@ The daemon maps urgency levels to libnotify priorities:
 ### Notification Categories
 
 Supported Android categories:
+
 - **msg**: Message notifications
 - **email**: Email notifications
 - **call**: Incoming call
@@ -165,6 +168,7 @@ Supported Android categories:
 This daemon is designed to work with **[Notif2MQTT](https://github.com/yourusername/Notif2MQTT)**, an Android app that captures device notifications and sends them to an MQTT broker.
 
 Together they enable:
+
 ```
 Android Device → Notif2MQTT App → MQTT Broker → mqtt2notif → Linux Desktop
 ```
@@ -176,6 +180,7 @@ Android Device → Notif2MQTT App → MQTT Broker → mqtt2notif → Linux Deskt
 ```
 
 This will:
+
 - Stop and disable the systemd service
 - Remove the service file
 - Remove the installed binary
@@ -187,11 +192,13 @@ Configuration file (`~/.config/mqtt2notif/config.ini`) is preserved.
 ### No notifications appearing
 
 1. Check the service is running:
+
    ```bash
    systemctl --user status mqtt2notif
    ```
 
 2. Check logs for errors:
+
    ```bash
    journalctl --user -u mqtt2notif -f
    ```
@@ -218,6 +225,7 @@ Configuration file (`~/.config/mqtt2notif/config.ini`) is preserved.
 ### Pillow warnings
 
 If you see "composite images won't work" warning:
+
 ```bash
 pip install --user Pillow
 ```
@@ -235,6 +243,7 @@ This is optional - basic notifications work without it.
 ### Configuration File Location
 
 Priority order:
+
 1. `$XDG_CONFIG_HOME/mqtt2notif/config.ini`
 2. `~/.config/mqtt2notif/config.ini`
 
