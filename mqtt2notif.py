@@ -21,10 +21,13 @@ from gi.repository import Notify, GdkPixbuf, GLib, Gio  # noqa: E402
 
 try:
     from PIL import Image, ImageDraw
+
     PIL_AVAILABLE = True
 except ImportError:
     PIL_AVAILABLE = False
-    print("Warning: Pillow not installed. Composite images (icon + preview) won't work.")
+    print(
+        "Warning: Pillow not installed. Composite images (icon + preview) won't work."
+    )
     print("Install with: pip install Pillow")
 
 # Global configuration
@@ -123,7 +126,7 @@ def create_default_config(config_file: Path = None):
 def pil_to_pixbuf(pil_image):
     """Convert PIL Image to GdkPixbuf.Pixbuf"""
     buffer = io.BytesIO()
-    pil_image.save(buffer, format='PNG')
+    pil_image.save(buffer, format="PNG")
     buffer.seek(0)
     stream = Gio.MemoryInputStream.new_from_data(buffer.read(), None)
     pixbuf = GdkPixbuf.Pixbuf.new_from_stream(stream, None)
@@ -139,21 +142,21 @@ def pixbuf_to_pil(pixbuf):
     has_alpha = pixbuf.get_has_alpha()
 
     if has_alpha:
-        mode = 'RGBA'
+        mode = "RGBA"
     else:
-        mode = 'RGB'
+        mode = "RGB"
 
-    image = Image.frombytes(mode, (width, height), pixels, 'raw', mode, rowstride)
+    image = Image.frombytes(mode, (width, height), pixels, "raw", mode, rowstride)
     return image
 
 
-def create_composite_image(icon_base64, preview_base64, position='bottom-right'):
+def create_composite_image(icon_base64, preview_base64, position="bottom-right"):
     """
     Create composite image with icon overlaid on preview
 
     Args:
-        icon_base64: Base64 encoded icon (128x128 PNG)
-        preview_base64: Base64 encoded preview (256x256 JPEG)
+        icon_base64: Base64 encoded icon
+        preview_base64: Base64 encoded preview
         position: Icon position ('bottom-right', 'top-right', 'top-left', 'bottom-left')
 
     Returns:
@@ -168,8 +171,8 @@ def create_composite_image(icon_base64, preview_base64, position='bottom-right')
         preview_data = base64.b64decode(preview_base64)
 
         # Load as PIL Images
-        icon_img = Image.open(io.BytesIO(icon_data)).convert('RGBA')
-        preview_img = Image.open(io.BytesIO(preview_data)).convert('RGBA')
+        icon_img = Image.open(io.BytesIO(icon_data)).convert("RGBA")
+        preview_img = Image.open(io.BytesIO(preview_data)).convert("RGBA")
 
         # Create composite
         composite = preview_img.copy()
@@ -180,16 +183,16 @@ def create_composite_image(icon_base64, preview_base64, position='bottom-right')
 
         # Calculate position
         margin = 8
-        if position == 'bottom-right':
+        if position == "bottom-right":
             x = composite.width - icon_size[0] - margin
             y = composite.height - icon_size[1] - margin
-        elif position == 'top-right':
+        elif position == "top-right":
             x = composite.width - icon_size[0] - margin
             y = margin
-        elif position == 'top-left':
+        elif position == "top-left":
             x = margin
             y = margin
-        elif position == 'bottom-left':
+        elif position == "bottom-left":
             x = margin
             y = composite.height - icon_size[1] - margin
         else:
@@ -197,10 +200,12 @@ def create_composite_image(icon_base64, preview_base64, position='bottom-right')
             y = margin
 
         # Add subtle shadow for visibility
-        shadow = Image.new('RGBA', icon_size, (0, 0, 0, 0))
+        shadow = Image.new("RGBA", icon_size, (0, 0, 0, 0))
         shadow_draw = ImageDraw.Draw(shadow)
-        shadow_draw.ellipse([4, 4, icon_size[0]-4, icon_size[1]-4], fill=(0, 0, 0, 100))
-        composite.paste(shadow, (x+2, y+2), shadow)
+        shadow_draw.ellipse(
+            [4, 4, icon_size[0] - 4, icon_size[1] - 4], fill=(0, 0, 0, 100)
+        )
+        composite.paste(shadow, (x + 2, y + 2), shadow)
 
         # Paste icon using alpha channel as mask
         composite.paste(icon_resized, (x, y), icon_resized)
@@ -300,7 +305,9 @@ def on_message(client, userdata, msg):
                 if VERBOSE:
                     print("   Creating composite image (preview + icon)...")
 
-                composite_pixbuf = create_composite_image(icon_base64, preview_image_base64, position='bottom-right')
+                composite_pixbuf = create_composite_image(
+                    icon_base64, preview_image_base64, position="bottom-right"
+                )
 
                 if composite_pixbuf:
                     try:
@@ -321,7 +328,9 @@ def on_message(client, userdata, msg):
                             ),
                         )
                         if VERBOSE:
-                            print("   ✓ Composite image set (preview with icon in bottom-right)")
+                            print(
+                                "   ✓ Composite image set (preview with icon in bottom-right)"
+                            )
                     except Exception as e:
                         if VERBOSE:
                             print(f"   ✗ Error setting composite image: {e}")
@@ -467,7 +476,9 @@ def main():
         print(f"{Colors.FAIL}✗ Error: Failed to initialize libnotify{Colors.ENDC}")
         sys.exit(1)
 
-    print(f"{Colors.HEADER}🚀 Starting Linux notification receiver{Colors.ENDC}")
+    print(
+        f"{Colors.HEADER}🚀 Starting MQTT to Linux Notification Receiver.{Colors.ENDC}"
+    )
     print(f"   Broker: {config['broker']}:{config['port']}")
     if config["ssl"]:
         print("   Security: SSL/TLS enabled")
