@@ -152,7 +152,7 @@ Supported Android categories:
 
 ## Related Projects
 
-This daemon is designed to work with **[Notif2MQTT](https://github.com/yourusername/Notif2MQTT)**, an Android app that captures device notifications and sends them to an MQTT broker.
+This daemon is designed to work with **[Notif2MQTT](https://github.com/vpont/Notif2MQTT)**, an Android app that captures device notifications and sends them to an MQTT broker.
 
 Together they enable:
 
