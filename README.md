@@ -30,25 +30,13 @@ A lightweight Python daemon that receives Android notifications from MQTT and di
 **Arch Linux:**
 
 ```bash
-sudo pacman -S python-gobject libnotify
+sudo pacman -S python-gobject python-paho-mqtt python-pillow libnotify
 ```
 
 **Ubuntu/Debian:**
 
 ```bash
-sudo apt install python3-gi gir1.2-notify-0.7 libnotify-bin
-```
-
-### Install Python Dependencies
-
-```bash
-pip install --user -r requirements.txt
-```
-
-Or manually:
-
-```bash
-pip install --user paho-mqtt PyGObject Pillow
+sudo apt install python3-gi python3-paho-mqtt python3-pillow gir1.2-notify-0.7 libnotify-bin
 ```
 
 ### Install as Systemd Service
@@ -209,18 +197,11 @@ Configuration file (`~/.config/mqtt2notif/config.ini`) is preserved.
    mosquitto_sub -h localhost -t "notif2mqtt/notifications" -v
    ```
 
-### Icon not displaying
-
-- Icons are decoded from Base64 and saved to `/tmp/notif_*.png`
-- Check that directory is writable
-- Verify Base64 data is valid PNG/JPEG
-
 ### SSL/TLS connection fails
 
 - Verify broker SSL configuration
 - Check certificate validity
 - Ensure port is correct (typically 8883 for SSL)
-- For self-signed certificates, you may need to configure trust
 
 ### Pillow warnings
 
