@@ -287,6 +287,9 @@ def on_message(client, userdata, msg):
             # Create notification
             notification = Notify.Notification.new(notification_title, text, None)
 
+            # Set app name
+            notification.set_app_name(app)
+
             # Set urgency
             if urgency == "high":
                 notification.set_urgency(Notify.Urgency.CRITICAL)
