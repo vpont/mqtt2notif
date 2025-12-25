@@ -8,7 +8,7 @@ A lightweight Python daemon that receives Android notifications from MQTT and di
 - 🔔 **Native Notifications**: Uses libnotify for desktop integration
 - 🔒 **Secure Connections**: Support for SSL/TLS encrypted MQTT
 - 🎨 **Icon Support**: Displays Base64-encoded notification icons
-- 🖼️ **Preview Images**: Shows preview images with composite overlays
+- 🖼️ **Preview Images**: Shows preview images via notification daemon
 - 🎯 **Urgency Mapping**: Respects notification importance levels
 - ⚙️ **Systemd Integration**: Run as a user service with auto-restart
 - 📁 **XDG Compliant**: Configuration follows XDG Base Directory spec
@@ -21,7 +21,6 @@ A lightweight Python daemon that receives Android notifications from MQTT and di
 - PyGObject (GObject bindings for Python)
 - paho-mqtt (MQTT client library)
 - MQTT Broker (e.g., Mosquitto)
-- Pillow (optional, for composite images)
 
 ## Installation
 
@@ -30,13 +29,13 @@ A lightweight Python daemon that receives Android notifications from MQTT and di
 **Arch Linux:**
 
 ```bash
-sudo pacman -S python-gobject python-paho-mqtt python-pillow libnotify
+sudo pacman -S python-gobject python-paho-mqtt libnotify
 ```
 
 **Ubuntu/Debian:**
 
 ```bash
-sudo apt install python3-gi python3-paho-mqtt python3-pillow gir1.2-notify-0.7 libnotify-bin
+sudo apt install python3-gi python3-paho-mqtt gir1.2-notify-0.7 libnotify-bin
 ```
 
 ### Install as Systemd Service
@@ -201,16 +200,6 @@ Configuration file (`~/.config/mqtt2notif/config.ini`) is preserved.
 - Verify broker SSL configuration
 - Check certificate validity
 - Ensure port is correct (typically 8883 for SSL)
-
-### Pillow warnings
-
-If you see "composite images won't work" warning:
-
-```bash
-pip install --user Pillow
-```
-
-This is optional - basic notifications work without it.
 
 ## Development
 

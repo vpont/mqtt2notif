@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 mqtt2notif is a Python daemon that subscribes to an MQTT broker and displays received notifications on Linux desktop using libnotify. It complements the **Notif2MQTT** Android app, which captures Android notifications and publishes them to MQTT.
 
-**Tech Stack**: Python 3, paho-mqtt (MQTT client), PyGObject (libnotify bindings), Pillow (image processing), systemd
+**Tech Stack**: Python 3, paho-mqtt (MQTT client), PyGObject (libnotify bindings), systemd
 
 ## Common Commands
 
@@ -105,18 +105,16 @@ Desktop Notification Display
 
 - **Library**: libnotify via PyGObject
 - **Features**:
-  - Icon display from Base64-encoded PNG/JPEG
-  - Preview image support with composite rendering
+  - Icon display
+  - Preview image support via image-path hint
   - Urgency level mapping (critical, normal, low)
   - Notification categories
   - Temporary file cleanup
 
 ### Image Processing
 
-- **Icon Handling**: Decode Base64 → attach to notification
-- **Preview Images**: Optional Pillow-based composite (icon overlaid on preview)
-- **Formats**: PNG, JPEG
-- **Cleanup**: Temporary files removed after notification display
+- **Icon Handling**: Decode Base64 → save to temp file → pass as app_icon
+- **Preview Images**: Decode Base64 → save to temp file → pass as image-path hint
 
 ## Data Flow
 
@@ -127,7 +125,6 @@ Desktop Notification Display
 5. **Image Decoding**: Decode Base64 icon/preview images to temporary files
 6. **Notification Creation**: Create libnotify notification with metadata
 7. **Display**: Show notification on desktop with appropriate urgency
-8. **Cleanup**: Remove temporary image files
 
 ## Data Model
 
@@ -175,7 +172,7 @@ Desktop Notification Display
 
 6. **Color-Coded Output**: Console uses ANSI colors for debugging (info=cyan, warning=yellow, error=red) to improve log readability during development.
 
-7. **Optional Pillow**: Pillow dependency is optional - basic notifications work without it. Only needed for composite image features (icon overlaid on preview).
+7. **Freedesktop Notification Spec**: Icon and preview image are passed separately to the notification daemon which handles compositing per the freedesktop notification spec.
 
 ## File Organization
 
@@ -215,7 +212,6 @@ password =                  # Optional MQTT password
 
 - **paho-mqtt** (1.6.1+): MQTT client library
 - **PyGObject**: GObject Introspection bindings
-- **Pillow** (optional): Image processing for composites
 
 ## Troubleshooting Development Issues
 
@@ -249,14 +245,6 @@ Ensure `Notify.init('mqtt2notif')` is called before creating any notifications. 
 - Test libnotify: `notify-send "Test" "Hello"`
 - Check systemd service logs: `journalctl --user -u mqtt2notif -f`
 - Verify DBUS session is accessible
-
-### "Pillow not installed" warning
-
-Optional dependency - install if you want composite images:
-
-```bash
-pip install --user Pillow
-```
 
 ### Icons not displaying
 
