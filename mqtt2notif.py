@@ -125,39 +125,40 @@ def create_default_config(config_file: Path = None):
 
 def pil_to_pixbuf(pil_image):
     """Convert PIL Image to GdkPixbuf.Pixbuf"""
-    buffer = io.BytesIO()
-    pil_image.save(buffer, format="PNG")
-    buffer.seek(0)
-    stream = Gio.MemoryInputStream.new_from_data(buffer.read(), None)
-    pixbuf = GdkPixbuf.Pixbuf.new_from_stream(stream, None)
+    if pil_image.mode != "RGBA":
+        pil_image = pil_image.convert("RGBA")
+
+    # Get data as raw bytes
+    data = pil_image.tobytes()
+    width, height = pil_image.size
+    has_alpha = True
+    bits_per_sample = 8
+    n_channels = 4
+    rowstride = width * n_channels
+
+    # Create GLib.Bytes from the data
+    glib_bytes = GLib.Bytes.new(data)
+
+    # Create pixbuf directly from bytes
+    pixbuf = GdkPixbuf.Pixbuf.new_from_bytes(
+        glib_bytes,
+        GdkPixbuf.Colorspace.RGB,
+        has_alpha,
+        bits_per_sample,
+        width,
+        height,
+        rowstride,
+    )
     return pixbuf
 
 
-def pixbuf_to_pil(pixbuf):
-    """Convert GdkPixbuf.Pixbuf to PIL Image"""
-    width = pixbuf.get_width()
-    height = pixbuf.get_height()
-    rowstride = pixbuf.get_rowstride()
-    pixels = pixbuf.get_pixels()
-    has_alpha = pixbuf.get_has_alpha()
-
-    if has_alpha:
-        mode = "RGBA"
-    else:
-        mode = "RGB"
-
-    image = Image.frombytes(mode, (width, height), pixels, "raw", mode, rowstride)
-    return image
-
-
-def create_composite_image(icon_base64, preview_base64, position="bottom-right"):
+def create_composite_image(icon_base64, preview_base64):
     """
     Create composite image with icon overlaid on preview
 
     Args:
         icon_base64: Base64 encoded icon
         preview_base64: Base64 encoded preview
-        position: Icon position ('bottom-right', 'top-right', 'top-left', 'bottom-left')
 
     Returns:
         GdkPixbuf.Pixbuf of composite image, or None on error
@@ -177,33 +178,30 @@ def create_composite_image(icon_base64, preview_base64, position="bottom-right")
         # Create composite
         composite = preview_img.copy()
 
-        # Resize icon to 64x64 for overlay
-        icon_size = (64, 64)
+        # Calculate relative icon size (25% of the shortest dimension)
+        icon_dim = max(32, int(min(composite.width, composite.height) * 0.25))
+        icon_size = (icon_dim, icon_dim)
         icon_resized = icon_img.resize(icon_size, Image.Resampling.LANCZOS)
 
-        # Calculate position
-        margin = 8
-        if position == "bottom-right":
-            x = composite.width - icon_size[0] - margin
-            y = composite.height - icon_size[1] - margin
-        elif position == "top-right":
-            x = composite.width - icon_size[0] - margin
-            y = margin
-        elif position == "top-left":
-            x = margin
-            y = margin
-        elif position == "bottom-left":
-            x = margin
-            y = composite.height - icon_size[1] - margin
-        else:
-            x = margin
-            y = margin
+        # Calculate relative margin (approx 2% of the shortest dimension)
+        margin = max(4, int(min(composite.width, composite.height) * 0.02))
 
-        # Add subtle shadow for visibility
+        # Calculate position (bottom-right)
+        x = composite.width - icon_size[0] - margin
+        y = composite.height - icon_size[1] - margin
+
+        # Add subtle shadow for visibility (relative to icon size)
+        shadow_margin = max(2, int(icon_dim * 0.06))
         shadow = Image.new("RGBA", icon_size, (0, 0, 0, 0))
         shadow_draw = ImageDraw.Draw(shadow)
         shadow_draw.ellipse(
-            [4, 4, icon_size[0] - 4, icon_size[1] - 4], fill=(0, 0, 0, 100)
+            [
+                shadow_margin,
+                shadow_margin,
+                icon_size[0] - shadow_margin,
+                icon_size[1] - shadow_margin,
+            ],
+            fill=(0, 0, 0, 100),
         )
         composite.paste(shadow, (x + 2, y + 2), shadow)
 
@@ -309,7 +307,7 @@ def on_message(client, userdata, msg):
                     print("   Creating composite image (preview + icon)...")
 
                 composite_pixbuf = create_composite_image(
-                    icon_base64, preview_image_base64, position="bottom-right"
+                    icon_base64, preview_image_base64
                 )
 
                 if composite_pixbuf:
